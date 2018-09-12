@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowEqualArrays from 'shallow-equal/arrays';
@@ -12,7 +13,7 @@ const defaultRenderSuggestionsContainer = ({ containerProps, children }) => (
 
 export default class Autosuggest extends Component {
   static propTypes = {
-    suggestions: PropTypes.array.isRequired,
+    suggestions: PropTypes.instanceOf(Immutable.List).isRequired,
     onSuggestionsFetchRequested: (props, propName) => {
       const onSuggestionsFetchRequested = props[propName];
 
@@ -125,7 +126,7 @@ export default class Autosuggest extends Component {
     if (shallowEqualArrays(nextProps.suggestions, this.props.suggestions)) {
       if (
         nextProps.highlightFirstSuggestion &&
-        nextProps.suggestions.length > 0 &&
+        nextProps.suggestions.count() > 0 &&
         this.justPressedUpDown === false &&
         this.justMouseEntered === false
       ) {
@@ -151,7 +152,7 @@ export default class Autosuggest extends Component {
 
     if (
       !shallowEqualArrays(suggestions, prevProps.suggestions) &&
-      suggestions.length > 0 &&
+      suggestions.count() > 0 &&
       highlightFirstSuggestion
     ) {
       this.highlightFirstSuggestion();
@@ -235,10 +236,10 @@ export default class Autosuggest extends Component {
     const { suggestions, multiSection, getSectionSuggestions } = this.props;
 
     if (multiSection) {
-      return getSectionSuggestions(suggestions[sectionIndex])[suggestionIndex];
+      return getSectionSuggestions(suggestions.get('sectionIndex')).get('suggestionIndex');
     }
 
-    return suggestions[suggestionIndex];
+    return suggestions.get(suggestionIndex);
   }
 
   getHighlightedSuggestion() {
@@ -325,7 +326,7 @@ export default class Autosuggest extends Component {
     const { suggestions, inputProps, shouldRenderSuggestions } = props;
     const { value } = inputProps;
 
-    return suggestions.length > 0 && shouldRenderSuggestions(value);
+    return suggestions.count() > 0 && shouldRenderSuggestions(value);
   }
 
   storeAutowhateverRef = autowhatever => {
@@ -532,7 +533,7 @@ export default class Autosuggest extends Component {
     const isOpen =
       alwaysRenderSuggestions ||
       (isFocused && !isCollapsed && willRenderSuggestions);
-    const items = isOpen ? suggestions : [];
+    const items = isOpen ? suggestions : Immutable.List();
     const autowhateverInputProps = {
       ...inputProps,
       onFocus: event => {
@@ -605,7 +606,7 @@ export default class Autosuggest extends Component {
                 });
                 this.revealSuggestions();
               }
-            } else if (suggestions.length > 0) {
+            } else if (suggestions.count() > 0) {
               const {
                 newHighlightedSectionIndex,
                 newHighlightedItemIndex

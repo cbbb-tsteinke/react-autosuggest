@@ -25,6 +25,7 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
+    "immutable":"3.8.2",
     "prop-types": "^15.5.10",
     "react-autowhatever": "^10.1.2",
     "shallow-equal": "^1.0.0"
